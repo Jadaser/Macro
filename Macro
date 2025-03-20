@@ -1,0 +1,30 @@
+Private Sub Worksheet_Change(ByVal Target As Range)
+    Dim tbl As ListObject
+    Dim tblName As String
+    Dim destino As Range
+
+    ' Verificar si la celda cambiada es B1
+    If Not Intersect(Target, Me.Range("A1")) Is Nothing Then
+        tblName = Me.Range("A1").Value ' Nombre de la tabla seleccionada
+        Set destino = Me.Range("A5") ' Celda donde se mostrará la tabla
+
+        ' Limpiar el área de destino
+        destino.CurrentRegion.Clear
+
+        ' Intentar obtener la tabla con el nombre seleccionado
+        On Error Resume Next
+        Set tbl = Me.ListObjects(tblName)
+        On Error GoTo 0
+
+        ' Si la tabla existe, copiarla en A5
+        If Not tbl Is Nothing Then
+            ' Copiar toda la tabla con su formato y tamaño
+            tbl.Range.Copy
+            destino.PasteSpecial Paste:=xlPasteAll ' Copiar todo (valores + formato + tamaño de celdas)
+            destino.PasteSpecial Paste:=xlPasteColumnWidths ' Copiar el ancho de las columnas
+            Application.CutCopyMode = False
+        Else
+            MsgBox "La tabla '" & tblName & "' no existe.", vbExclamation, "Error"
+        End If
+    End If
+End Sub
